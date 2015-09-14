@@ -36,7 +36,7 @@ public class Link {
 		if (url == null) {
 			if (other.url != null)
 				return false;
-		} else if (!url.equals(other.url))
+		} else if (!url.toLowerCase().equals(other.url.toLowerCase()))
 			return false;
 		return true;
 	}
@@ -51,7 +51,7 @@ public class Link {
 	
 	public static void main(String[] args){
 		Link l1 = new Link ("hi", 0);
-		Link l2 = new Link ("hi", 2);
+		Link l2 = new Link ("Hi", 2);
 		
 		System.out.println(l1.equals(l2));	
 	}

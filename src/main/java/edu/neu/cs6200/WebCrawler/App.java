@@ -17,15 +17,18 @@ public class App {
 	static ArrayList<Link> visited = new ArrayList<Link>();
 	static int i;
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+		
 		i = 0; 
 		Document doc;
 		Elements links;
 		Link start = new Link(
-				"http://en.wikipedia.org/wiki/Hugh_of_Saint-Cher", 0);
+				"https://en.wikipedia.org/wiki/Hugh_of_Saint-Cher", 0);
 		toVisit.add(start);
+		
 		while ((!toVisit.isEmpty()) && (visited.size() < 1000)) {
+		
 			Link node = toVisit.get(0);
-			if (node.getDistance() < 5 && toVisit.size()<1000) {
+			if (node.getDistance() < 5 && toVisit.size() < 1000) {
 				try {
 					doc = Jsoup.connect(node.getUrl()).get();
 					links = doc.select("a[href]");
@@ -38,14 +41,15 @@ public class App {
 					e.printStackTrace();
 				}
 			}
-			visited.add(toVisit.get(0));
 			
 			System.out.println("toVisit: " + toVisit.size() + "  Visited: " + visited.size() + "  Distance: " + node.getDistance() + " " + toVisit.get(0).getUrl() );
+			visited.add(toVisit.get(0));
 			toVisit.remove(0);
 		}
 		
 		PrintWriter writer = new PrintWriter("visited.txt", "UTF-8");
-		System.out.println(visited.size());
+		System.out.println("Visted: " + visited.size());
+		System.out.println("toVist: " + toVisit.size());
 		for(Link l : visited){
 			writer.println(l.getUrl());
 		}
@@ -55,7 +59,7 @@ public class App {
 	public static void filter(Link link) {
 		boolean c1, c2, c3, c4;
 
-		c1 = link.getUrl().contains("://en.wikipedia.org/wiki/");
+		c1 = link.getUrl().toLowerCase().contains("https://en.wikipedia.org/wiki/".toLowerCase());
 
 		if ((link.getUrl().length() - link.getUrl().replaceAll(":", "")
 				.length()) == 1)
@@ -63,7 +67,7 @@ public class App {
 		else
 			c2 = false;
 
-		if (link.getUrl().contains("://en.wikipedia.org/wiki/Main_Page"))
+		if (link.getUrl().toLowerCase().contains("https://en.wikipedia.org/wiki/Main_Page".toLowerCase()))
 			c3 = false;
 		else
 			c3 = true;
@@ -75,7 +79,7 @@ public class App {
 
 		if (c1 && c2 && c3 && c4) {
 			i++;
-			//System.out.println(i + " " + c1 + " " + c2 + " " + c3 + " " + c4 + link.getUrl());
+//			System.out.println(i + " " + c1 + " " + c2 + " " + c3 + " " + c4 + link.getUrl());
 			toVisit.add(link);
 		}
 	}
