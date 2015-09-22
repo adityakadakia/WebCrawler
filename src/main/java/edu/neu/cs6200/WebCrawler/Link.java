@@ -20,8 +20,7 @@ public class Link {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + distance;
-		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.toLowerCase().hashCode());
 		return result;
 	}
 	@Override
@@ -53,6 +52,8 @@ public class Link {
 		Link l1 = new Link ("hi", 0);
 		Link l2 = new Link ("Hi", 2);
 		
-		System.out.println(l1.equals(l2));	
+		System.out.println(l1.equals(l2));
+		System.out.println(l1.hashCode());
+		System.out.println(l2.hashCode());
 	}
 }
