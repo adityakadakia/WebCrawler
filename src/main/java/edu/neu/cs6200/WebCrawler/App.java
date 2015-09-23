@@ -16,25 +16,80 @@ import org.jsoup.select.Elements;
 public class App {
 	
 	static final int MAX_DEPTH = 5;
+	static final long POLITE = 1000;
+	static final Link SEED = new Link(
+			"https://en.wikipedia.org/wiki/Hugh_of_Saint-Cher", 0);
 	
 	static ArrayList<Link> toVisit = new ArrayList<Link>();
 	static ArrayList<Link> visited = new ArrayList<Link>();
+	static ArrayList<Link> keylinks = new ArrayList<Link>();	
 	static int i;
+	static long startTime, endTime, execTime;
+	static Document doc;
+	static Elements links;
+	static String keyphrase;
 	
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
 		 
-		final long POLITE = 1000;
-		
-		final Link SEED = new Link(
-				"https://en.wikipedia.org/wiki/Hugh_of_Saint-Cher", 0);
-		long startTime, endTime, execTime;
-		Document doc;
-		Elements links;
-		
-		i = 0;
+		keyphrase = "concordance";
 		toVisit.add(SEED);
-		while ((!toVisit.isEmpty()) && (visited.size() < 1000)) {
+		focused();
 		
+	}
+
+	public static void focused() throws FileNotFoundException, UnsupportedEncodingException{
+
+		boolean keyfound;
+		while ((!toVisit.isEmpty()) && (keylinks.size() < 1000)) {
+			
+			startTime = new Date().getTime();
+			Link node = toVisit.get(0);
+			
+			if (!visited.contains(node))
+				while (true) {
+					try {
+						doc = Jsoup.connect(node.getUrl()).get();
+						links = doc.select("a[href]");
+						for (Element link : links) {
+							filter(new Link(link.absUrl("href"),
+									(node.getDistance() + 1)));	
+						}
+						visited.add(node);
+						if (doc.getElementsContainingOwnText(keyphrase).size() > 0){
+							keylinks.add(node);
+						}
+						System.out.println("toVisit: " + toVisit.size()
+								+ "  Visited: " + visited.size()
+								+ "  Distance: " + node.getDistance() + " "
+								+ "  keylinks: " + keylinks.size() + " "
+								+ toVisit.get(0).getUrl());
+						break;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			toVisit.remove(0);
+			
+			endTime = new Date().getTime();
+			execTime = endTime - startTime;
+			//if ( execTime < POLITE ) Thread.sleep( POLITE - execTime );
+				
+		}
+		PrintWriter writer = new PrintWriter("keylinks.txt", "UTF-8");
+		System.out.println("Visted: " + visited.size());
+		System.out.println("toVisit: " + toVisit.size());
+		System.out.println("keylinks: " + keylinks.size());
+		for(Link l : keylinks){
+			writer.println(l.getUrl());
+		}
+		writer.close();
+	}
+
+	
+	public static void unfocused() throws FileNotFoundException, UnsupportedEncodingException{
+		while ((!toVisit.isEmpty()) && (visited.size() < 1000)) {
+			
 			startTime = new Date().getTime();
 			Link node = toVisit.get(0);
 			
@@ -55,25 +110,23 @@ public class App {
 					e.printStackTrace();
 				}
 			}
-			
-			
 			toVisit.remove(0);
 			
 			endTime = new Date().getTime();
 			execTime = endTime - startTime;
 			//if ( execTime < POLITE ) Thread.sleep( POLITE - execTime );
-				
+			
 		}
 		
 		PrintWriter writer = new PrintWriter("visited.txt", "UTF-8");
 		System.out.println("Visted: " + visited.size());
-		System.out.println("toVist: " + toVisit.size());
+		System.out.println("toVisit: " + toVisit.size());
 		for(Link l : visited){
 			writer.println(l.getUrl());
 		}
 		writer.close();
 	}
-
+	
 	public static void filter(Link link) {
 		boolean c1, c2, c3, c4, c5;
 		
