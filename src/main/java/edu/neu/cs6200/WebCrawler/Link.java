@@ -1,5 +1,4 @@
 package edu.neu.cs6200.WebCrawler;
-
 public class Link {
 	String url;
 	int distance;
@@ -35,7 +34,7 @@ public class Link {
 		if (url == null) {
 			if (other.url != null)
 				return false;
-		} else if (!url.toLowerCase().equals(other.url.toLowerCase()))
+		} else if (!url.equalsIgnoreCase(other.url))
 			return false;
 		return true;
 	}
